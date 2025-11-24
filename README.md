@@ -54,7 +54,7 @@ JWT_EXPIRES=1d
 NODE_ENV=development
 ```
 
-> **Importante:** La base de datos `test` se creará automáticamente al iniciar el proyecto por primera vez.
+> **Importante:** La base de datos `test` debe crearse en el admin del mysql con el nombre "test" 
 
 ### 5. Iniciar el Servidor
 

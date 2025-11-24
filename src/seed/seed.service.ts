@@ -43,49 +43,69 @@ export class SeedService {
   }
 
   private async seedUsers() {
-    const userCount = await this.userRepository.count();
-    if (userCount > 0) {
-      console.log('⚠️  Ya existen usuarios en la base de datos');
-      return;
-    }
+    // Verificar si ya existen los usuarios administradores
+    const adminExists = await this.userRepository.findOne({
+      where: { username: 'admin' },
+    });
+    const vendedorExists = await this.userRepository.findOne({
+      where: { username: 'vendedor' },
+    });
 
-    const users = [
-      {
+    const users = [];
+
+    // Siempre crear o mantener los usuarios administradores
+    if (!adminExists) {
+      users.push({
         username: 'admin',
         password: await bcryptjs.hash('admin123', 10),
         nombre: 'Administrador del Sistema',
         email: 'admin@pokeshop.com',
         role: UserRole.ADMIN,
-      },
-      {
-        username: 'vendedor1',
+      });
+    }
+
+    if (!vendedorExists) {
+      users.push({
+        username: 'vendedor',
         password: await bcryptjs.hash('vendedor123', 10),
-        nombre: 'Carlos Vendedor',
+        nombre: 'Vendedor Principal',
         email: 'vendedor@pokeshop.com',
         role: UserRole.VENDEDOR,
-      },
-      {
-        username: 'cliente1',
-        password: await bcryptjs.hash('cliente123', 10),
-        nombre: 'Juan Cliente',
-        email: 'cliente1@example.com',
-        role: UserRole.CLIENTE,
-      },
-      {
-        username: 'cliente2',
-        password: await bcryptjs.hash('cliente123', 10),
-        nombre: 'María López',
-        email: 'cliente2@example.com',
-        role: UserRole.CLIENTE,
-      },
-    ];
+      });
+    }
 
+    // Agregar usuarios de prueba solo si no hay ningún usuario en la BD
+    const userCount = await this.userRepository.count();
+    if (userCount === 0) {
+      users.push(
+        {
+          username: 'cliente1',
+          password: await bcryptjs.hash('cliente123', 10),
+          nombre: 'Juan Cliente',
+          email: 'cliente1@example.com',
+          role: UserRole.CLIENTE,
+        },
+        {
+          username: 'cliente2',
+          password: await bcryptjs.hash('cliente123', 10),
+          nombre: 'María López',
+          email: 'cliente2@example.com',
+          role: UserRole.CLIENTE,
+        },
+      );
+    }
+
+    // Insertar usuarios nuevos
     for (const userData of users) {
       const user = this.userRepository.create(userData);
       await this.userRepository.save(user);
     }
 
-    console.log('✅ Usuarios insertados correctamente');
+    if (users.length > 0) {
+      console.log(`✅ ${users.length} usuario(s) insertado(s) correctamente`);
+    } else {
+      console.log('✅ Los usuarios administradores ya existen');
+    }
   }
 
   private async seedCategorias() {
