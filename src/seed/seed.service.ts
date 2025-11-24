@@ -143,12 +143,6 @@ export class SeedService {
   }
 
   private async seedProductos() {
-    const productoCount = await this.productoRepository.count();
-    if (productoCount > 0) {
-      console.log('⚠️  Ya existen productos en la base de datos');
-      return;
-    }
-
     // Obtener categorías para asignarlas a los productos
     const categoriaFuego = await this.categoriaRepository.findOne({
       where: { nombre: 'Cartas de Fuego' },
@@ -254,12 +248,27 @@ export class SeedService {
       },
     ];
 
+    let insertados = 0;
+    let omitidos = 0;
+
     for (const productoData of productos) {
-      const producto = this.productoRepository.create(productoData);
-      await this.productoRepository.save(producto);
+      // Verificar si el producto ya existe por nombre
+      const exists = await this.productoRepository.findOne({
+        where: { nombre: productoData.nombre },
+      });
+
+      if (!exists) {
+        const producto = this.productoRepository.create(productoData);
+        await this.productoRepository.save(producto);
+        insertados++;
+      } else {
+        omitidos++;
+      }
     }
 
-    console.log('✅ Productos (cartas Pokemon) insertados correctamente');
+    console.log(
+      `✅ Productos del seed: ${insertados} insertados, ${omitidos} ya existían`,
+    );
   }
 
   private async seedBoletas() {

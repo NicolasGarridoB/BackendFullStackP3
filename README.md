@@ -77,6 +77,7 @@ Una vez que el servidor esté corriendo:
 2. Desplázate hasta el final de la página, justo **arriba de los schemas**
 3. Busca la sección **"Seed"**
 4. Ejecuta el endpoint `POST /api/v1/seed` haciendo clic en **"Try it out"** → **"Execute"**
+5. Es necesario realizar este paso antes de intentar iniciar sesion como admin o vendedor, ya que estos datos de usuario se inyectan.
 
 Esto creará las tablas necesarias e inyectará datos iniciales (usuarios, productos, categorías).
 

@@ -9,16 +9,22 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ProductosService } from './productos.service';
 import { CreateProductoDto } from './dto/create.product.dto';
 import { UpdateProductoDto } from './dto/update.product.dto';
+import { AuthGuard } from '../auth/guard/auth.guard';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../users/entities/user.entity';
 
 @ApiTags('Productos - Cartas Pokemon')
 @Controller('productos')
@@ -26,11 +32,14 @@ export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
 
   @Post()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.VENDEDOR)
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Crear nueva carta Pokemon',
     description:
-      'Registra una nueva carta Pokemon en el inventario de la tienda',
+      'Registra una nueva carta Pokemon en el inventario de la tienda (solo ADMIN y VENDEDOR)',
   })
   @ApiResponse({
     status: 201,
@@ -39,6 +48,10 @@ export class ProductosController {
   @ApiResponse({
     status: 400,
     description: 'Datos de entrada inválidos',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Acceso denegado - Se requiere rol ADMIN o VENDEDOR',
   })
   create(@Body() createProductoDto: CreateProductoDto) {
     return this.productosService.create(createProductoDto);
@@ -116,10 +129,13 @@ export class ProductosController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.VENDEDOR)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Actualizar carta Pokemon',
     description:
-      'Actualiza los datos de una carta Pokemon existente (precio, stock, etc.)',
+      'Actualiza los datos de una carta Pokemon existente (precio, stock, etc.) - Solo ADMIN y VENDEDOR',
   })
   @ApiParam({
     name: 'id',
@@ -134,6 +150,10 @@ export class ProductosController {
     status: 404,
     description: 'Carta no encontrada',
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Acceso denegado - Se requiere rol ADMIN o VENDEDOR',
+  })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductoDto: UpdateProductoDto,
@@ -142,10 +162,13 @@ export class ProductosController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Eliminar carta Pokemon',
-    description: 'Elimina una carta Pokemon del catálogo',
+    description: 'Elimina una carta Pokemon del catálogo (solo ADMIN)',
   })
   @ApiParam({
     name: 'id',
@@ -159,6 +182,10 @@ export class ProductosController {
   @ApiResponse({
     status: 404,
     description: 'Carta no encontrada',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Acceso denegado - Se requiere rol ADMIN',
   })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productosService.remove(id);
