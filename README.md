@@ -1,8 +1,8 @@
-# 🎴 Backend FullStack P3 - Tienda de Cartas Pokémon
+# Backend FullStack P3 - Tienda de Cartas Pokémon
 
 API REST desarrollada con NestJS para una tienda de cartas Pokémon. Incluye sistema de autenticación JWT, gestión de productos, categorías, usuarios y boletas de compra.
 
-## 📋 Requisitos Previos
+## Requisitos Previos
 
 Antes de comenzar, asegúrate de tener instalado:
 
@@ -10,7 +10,7 @@ Antes de comenzar, asegúrate de tener instalado:
 - [XAMPP](https://www.apachefriends.org/) con **Apache** y **MySQL**
 - Git
 
-## 🚀 Instalación y Configuración
+## Instalación y Configuración
 
 ### 1. Clonar el Repositorio
 
@@ -77,17 +77,25 @@ Una vez que el servidor esté corriendo:
 2. Desplázate hasta el final de la página, justo **arriba de los schemas**
 3. Busca la sección **"Seed"**
 4. Ejecuta el endpoint `POST /api/v1/seed` haciendo clic en **"Try it out"** → **"Execute"**
-5. Es necesario realizar este paso antes de intentar iniciar sesion como admin o vendedor, ya que estos datos de usuario se inyectan.
+5. Es necesario realizar este paso antes de intentar iniciar sesion como admin o vendedor, ya que estos datos de usuario se inyectan. Las credenciales para iniciar sesión como admin son: 
+
+    usuario: admin
+    contraseña: admin123
 
 Esto creará las tablas necesarias e inyectará datos iniciales (usuarios, productos, categorías).
 
-## 📚 Uso de la API
+### Probar la APP
+
+Como administrador podrás crear nuevos productos y nuevas categorias, y estas se verán reflejadas en la bd.
+
+
+## Uso de la API
 
 ### Acceder a Swagger UI
 
 Toda la documentación interactiva de la API está disponible en:
 
-**🔗 http://localhost:3000/docs**
+** http://localhost:3000/docs**
 
 ### Autenticación con JWT
 
@@ -101,7 +109,7 @@ Para endpoints protegidos:
 
 Ahora podrás acceder a todos los endpoints protegidos.
 
-## 🗂️ Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```
 src/
@@ -115,7 +123,7 @@ src/
 └── main.ts         # Punto de entrada de la aplicación
 ```
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 - **NestJS** - Framework de Node.js
 - **TypeORM** - ORM para TypeScript
@@ -125,7 +133,7 @@ src/
 - **class-validator** - Validación de datos
 - **bcrypt** - Encriptación de contraseñas
 
-## 📝 Scripts Disponibles
+##  Scripts Disponibles
 
 ```bash
 # Desarrollo con hot-reload
@@ -147,7 +155,7 @@ npm run format
 npm run lint
 ```
 
-## 🔐 Seguridad
+##  Seguridad
 
 - Las contraseñas se encriptan usando **bcrypt**
 - Autenticación mediante **JWT** (JSON Web Tokens)
@@ -155,10 +163,3 @@ npm run lint
 - Guards para proteger rutas según roles de usuario
 - CORS configurado para permitir peticiones desde el frontend
 
-## 📞 Soporte
-
-Si encuentras algún problema o tienes preguntas, por favor abre un issue en el repositorio de GitHub.
-
-## 📄 Licencia
-
-Este proyecto es de código abierto y está disponible bajo la licencia MIT.
