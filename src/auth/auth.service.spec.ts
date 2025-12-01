@@ -14,14 +14,16 @@ describe('AuthService', () => {
 
   const mockUser = {
     id: 1,
-    name: 'Test User',
+    username: 'testuser',
+    nombre: 'Test User',
     email: 'test@example.com',
     password: '$2a$10$hashedpassword',
-    rol: 'user',
+    role: 'CLIENTE',
   };
 
   const mockUsersService = {
     findByEmail: jest.fn(),
+    findByUsername: jest.fn(),
     create: jest.fn(),
   };
 
@@ -59,13 +61,15 @@ describe('AuthService', () => {
 
   describe('register', () => {
     const registerDto: RegisterDto = {
-      name: 'New User',
+      username: 'newuser',
+      nombre: 'New User',
       email: 'newuser@example.com',
       password: 'password123',
     };
 
     it('debe registrar un nuevo usuario exitosamente', async () => {
       mockUsersService.findByEmail.mockResolvedValue(null);
+      mockUsersService.findByUsername.mockResolvedValue(null);
       mockUsersService.create.mockResolvedValue(mockUser);
 
       const result = await service.register(registerDto);
@@ -84,13 +88,14 @@ describe('AuthService', () => {
         BadRequestException,
       );
       await expect(service.register(registerDto)).rejects.toThrow(
-        'Email ya existe',
+        'El email ya está registrado',
       );
       expect(mockUsersService.create).not.toHaveBeenCalled();
     });
 
     it('debe hashear la contraseña antes de crear el usuario', async () => {
       mockUsersService.findByEmail.mockResolvedValue(null);
+      mockUsersService.findByUsername.mockResolvedValue(null);
       mockUsersService.create.mockResolvedValue(mockUser);
 
       await service.register(registerDto);
@@ -103,7 +108,7 @@ describe('AuthService', () => {
 
   describe('login', () => {
     const loginDto: LoginDto = {
-      email: 'test@example.com',
+      usernameOrEmail: 'test@example.com',
       password: 'password123',
     };
 
@@ -111,6 +116,7 @@ describe('AuthService', () => {
       const hashedPassword = await bcryptjs.hash('password123', 10);
       const userWithHashedPassword = { ...mockUser, password: hashedPassword };
 
+      mockUsersService.findByUsername.mockResolvedValue(null);
       mockUsersService.findByEmail.mockResolvedValue(userWithHashedPassword);
       mockJwtService.sign.mockReturnValue('jwt-token-123');
 
@@ -118,18 +124,26 @@ describe('AuthService', () => {
 
       expect(result).toEqual({
         access_token: 'jwt-token-123',
-        email: mockUser.email,
-        name: mockUser.name,
+        user: {
+          id: mockUser.id,
+          username: mockUser.username,
+          email: mockUser.email,
+          nombre: mockUser.nombre,
+          role: mockUser.role,
+        },
       });
-      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
+      expect(mockUsersService.findByEmail).toHaveBeenCalled();
       expect(mockJwtService.sign).toHaveBeenCalledWith({
         sub: mockUser.id,
+        username: mockUser.username,
         email: mockUser.email,
-        name: mockUser.name,
+        nombre: mockUser.nombre,
+        role: mockUser.role,
       });
     });
 
     it('debe lanzar UnauthorizedException si el usuario no existe', async () => {
+      mockUsersService.findByUsername.mockResolvedValue(null);
       mockUsersService.findByEmail.mockResolvedValue(null);
 
       await expect(service.login(loginDto)).rejects.toThrow(
@@ -145,6 +159,7 @@ describe('AuthService', () => {
       const hashedPassword = await bcryptjs.hash('wrongpassword', 10);
       const userWithHashedPassword = { ...mockUser, password: hashedPassword };
 
+      mockUsersService.findByUsername.mockResolvedValue(null);
       mockUsersService.findByEmail.mockResolvedValue(userWithHashedPassword);
 
       await expect(service.login(loginDto)).rejects.toThrow(
