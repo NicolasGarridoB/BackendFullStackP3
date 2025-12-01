@@ -55,6 +55,9 @@ NODE_ENV=development
 ```
 
 > **Importante:** La base de datos `test` debe crearse en el admin del mysql con el nombre "test" 
+Ejecutar el siguiente comando en mysql:
+
+CREATE DATABASE test;
 
 ### 5. Iniciar el Servidor
 
